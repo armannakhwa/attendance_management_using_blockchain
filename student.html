@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendance Management-Developed By Arman & Team</title>
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.5.3/dist/web3.min.js"></script>
+
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+</head>
+
+
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center">Attendance Management-Developed By Arman & Team</h1>
+        <div class="row">
+            <div class="col-lg-12">
+                Teacher<select id="accountSelect" class="form-control">
+                </select>
+
+
+                <fieldset>
+                    <legend>Student Details</legend>
+                    <div class="form-group">
+                        <label for="id">Student ID</label>
+                        <input id="id" type="text" class="form-control" placeholder="Enter Student ID">
+                    </div>
+                    <div class="form-group">
+                        <label for="age">Age</label>
+                        <input id="age" type="text" class="form-control" placeholder="Enter Age">
+                    </div>
+                    <div class="form-group">
+                        <label for="fname">Subject</label>
+                        <input id="subject" type="text" class="form-control" placeholder="Enter First Name">
+                    </div>
+                    <div class="form-group">
+                        <label for="fname">First Name</label>
+                        <input id="fname" type="text" class="form-control" placeholder="Enter First Name">
+                    </div>
+                    <div class="form-group">
+                        <label for="lname">Last Name</label>
+                        <input id="lname" type="text" class="form-control" placeholder="Enter Last Name">
+                    </div>
+                    <div class="form-group">
+                        <label for="lname">Date</label>
+                        <input id="date" type="date" class="form-control" placeholder="Enter Last Name">
+                    </div>
+                    <button id="button" class="btn btn-primary">Update Student</button>
+                </fieldset>
+                <fieldset class="mt-5">
+                    <legend>Increment Attendance</legend>
+                    <div class="form-group">
+                        <label for="idAttendance">Student ID</label>
+                        <input id="idAttendance" type="text" class="form-control"
+                            placeholder="Enter the Student ID to increment the attendance">
+                        <h2 id="attendance"></h2>
+                    </div>
+                    <button id="btnIncAttnd" class="btn btn-primary">Increment Attendance</button>
+                </fieldset>
+                <fieldset class="mt-5">
+                    <legend>Decrement Attendance</legend>
+                    <div class="form-group">
+                        <label for="idAttendanceDec">Student ID</label>
+                        <input id="idAttendanceDec" type="text" class="form-control"
+                            placeholder="Enter the Student ID to decrement the attendance">
+                        <h2 id="attendanceDec"></h2>
+                    </div>
+                    <button id="btnDecAttnd" class="btn btn-primary">Decrement Attendance</button>
+                </fieldset>
+            </div>
+            <div class="col-lg-6">
+                <fieldset>
+                    <legend>Student Details</legend>
+                    <div class="form-group">
+                        <label for="idDetails">Student ID/Roll No</label>
+                        <input id="idDetails" type="text" class="form-control"
+                            placeholder="Enter the student ID to get the details">
+                    </div>
+                    <button id="btnDetails" class="btn btn-primary">Get Details</button>
+                    <h2 id="stdDetails"></h2>
+                </fieldset>
+
+
+                <fieldset class="mt-5">
+                    <legend>Get All Student Details</legend>
+                    <button id="btnAllDetails" class="btn btn-primary">Get all Details</button>
+                    <h2 id="stdAllDetails"></h2>
+
+
+                </fieldset>
+
+
+                <fieldset class="mt-5">
+                    <legend>Students Count</legend>
+                    <button id="btnCount" class="btn btn-primary">Students Count</button>
+                    <h2 id="stdCount"></h2>
+                </fieldset>
+                <fieldset>
+                    <fieldset class="mt-5">
+                        <legend>Students ID List</legend>
+                        <button id="btnStdIds" class="btn btn-primary">Get Student IDs</button>
+                        <h2 id="stdIds"></h2>
+
+
+                    </fieldset>
+                </fieldset>
+            </div>
+
+
+            <script>
+                const contractABI = [{
+                        "constant": true,
+                        "inputs": [{
+                            "name": "",
+                            "type": "uint256"
+                        }],
+                        "name": "studIdList",
+                        "outputs": [{
+                            "name": "",
+                            "type": "uint256"
+                        }],
+                        "payable": false,
+                        "stateMutability": "view",
+                        "type": "function"
+                    },
+                    {
+                        "constant": false,
+                        "inputs": [{
+                            "name": "_studId",
+                            "type": "uint256"
+                        }],
+                        "name": "decrementAttendance",
+                        "outputs": [],
+                        "payable": false,
+                        "stateMutability": "nonpayable",
+                        "type": "function"
+                    },
+                    {
+                        "constant": true,
+                        "inputs": [],
+                        "name": "countStudents",
+                        "outputs": [{
+                            "name": "",
+                            "type": "uint256"
+                        }],
+                        "payable": false,
+                        "stateMutability": "view",
+                        "type": "function"
+                    },
+                    {
+                        "constant": true,
+                        "inputs": [{
+                            "name": "_studId",
+                            "type": "uint256"
+                        }],
+                        "name": "getParticularStudent",
+                        "outputs": [{
+                                "name": "",
+                                "type": "string"
+                            },
+                            {
+                                "name": "",
+                                "type": "string"
+                            },
+                            {
+                                "name": "",
+                                "type": "string"
+                            },
+                            {
+                                "name": "",
+                                "type": "uint256"
+                            },
+                            {
+                                "name": "",
+                                "type": "uint256"
+                            },
+                            {
+                                "name": "",
+                                "type": "string"
+                            }
+                        ],
+                        "payable": false,
+                        "stateMutability": "view",
+                        "type": "function"
+                    },
+                    {
+                        "constant": false,
+                        "inputs": [{
+                                "name": "_studId",
+                                "type": "uint256"
+                            },
+                            {
+                                "name": "_age",
+                                "type": "uint256"
+                            },
+                            {
+                                "name": "_subject",
+                                "type": "string"
+                            },
+                            {
+                                "name": "_fName",
+                                "type": "string"
+                            },
+                            {
+                                "name": "_lName",
+                                "type": "string"
+                            },
+                            {
+                                "name": "_Date",
+                                "type": "string"
+                            }
+                        ],
+                        "name": "createStudent",
+                        "outputs": [],
+                        "payable": false,
+                        "stateMutability": "nonpayable",
+                        "type": "function"
+                    },
+                    {
+                        "constant": true,
+                        "inputs": [],
+                        "name": "getStudents",
+                        "outputs": [{
+                            "name": "",
+                            "type": "uint256[]"
+                        }],
+                        "payable": false,
+                        "stateMutability": "view",
+                        "type": "function"
+                    },
+                    {
+                        "constant": false,
+                        "inputs": [{
+                            "name": "_studId",
+                            "type": "uint256"
+                        }],
+                        "name": "incrementAttendance",
+                        "outputs": [],
+                        "payable": false,
+                        "stateMutability": "nonpayable",
+                        "type": "function"
+                    },
+                    {
+                        "anonymous": false,
+                        "inputs": [{
+                                "indexed": false,
+                                "name": "subject",
+                                "type": "string"
+                            },
+                            {
+                                "indexed": false,
+                                "name": "fName",
+                                "type": "string"
+                            },
+                            {
+                                "indexed": false,
+                                "name": "lName",
+                                "type": "string"
+                            },
+                            {
+                                "indexed": false,
+                                "name": "age",
+                                "type": "uint256"
+                            },
+                            {
+                                "indexed": false,
+                                "name": "date",
+                                "type": "string"
+                            }
+                        ],
+                        "name": "studentCreationEvent",
+                        "type": "event"
+                    }
+                ];
+
+
+
+
+                const contractAddress = '0x48Ad27E83218cFA682849c510D9754a57a0e8059'; //remix
+
+
+                const web3 = new Web3('http://localhost:7545');
+                const contract = new web3.eth.Contract(contractABI, contractAddress);
+
+
+
+
+                web3.eth.getAccounts().then(function (accounts) {
+                    const accountSelect = document.getElementById("accountSelect");
+
+
+                    // Add an option for each account
+                    accounts.forEach(function (account) {
+                        const option = document.createElement("option");
+                        option.text = account;
+                        option.value = account;
+                        accountSelect.add(option);
+                    });
+
+
+                    // Set the default account to the first account in the list
+                    web3.eth.defaultAccount = accounts[0];
+                    from = accounts[0];
+
+
+                    // Update the default account when a new option is selected
+                    accountSelect.addEventListener("change", function () {
+                        web3.eth.defaultAccount = this.value;
+                        from = this.value;
+                        //alert(from)
+
+
+                    });
+
+
+                    // Get the current gas price
+                    web3.eth.getGasPrice().then(function (gasPrice) {
+                        console.log("Gas price in Wei: " + gasPrice);
+                        console.log("Gas price in Gwei: " + web3.utils.fromWei(gasPrice, 'Gwei'));
+                        gas = 300000;
+                    });
+
+
+
+
+                    // Log the default account to the console
+                    console.log("Default account:", web3.eth.defaultAccount);
+
+
+
+
+
+
+                    $("#button").click(function () {
+
+
+                        contract.methods.createStudent($("#id").val(), $("#age").val(), $("#subject")
+                                .val(), $("#fname").val(), $("#lname").val(), $("#date").val()).send({
+                                from: from,
+                                gas: gas
+                            })
+                            .on('receipt', function (receipt) {
+                                alert('New student record created!');
+                                console.log('Transaction hash:', receipt.transactionHash);
+                            })
+                            .on('error', function (error) {
+                                console.error(error);
+                                alert("Something Went wrong");
+
+
+                            });
+
+
+
+
+                    });
+
+
+
+
+                    //For Incrementing Attendance
+                    $("#btnIncAttnd").click(function () {
+
+
+                        contract.methods.incrementAttendance($("#idAttendance").val()).send({
+                            from: from,
+                            gas: gas
+                        })
+                        contract.methods.getParticularStudent($("#idAttendance").val()).call()
+                            .then(function (result) {
+                                console.log('Incrementing Attendance:', result);
+
+
+                                $("#attendance").html('Attendance Incremented ' + result[0] +
+                                    ' for ' + result[1] + ' ' + result[2]);
+                            })
+                            .catch(function (error) {
+                                console.error(error);
+                                alert("Attendance not mark")
+                            });
+                    });
+
+
+
+
+                    //For Decrementing Attendance
+                    $("#btnDecAttnd").click(function () {
+                        contract.methods.decrementAttendance($("#idAttendanceDec").val()).send({
+                            from: from,
+                            gas: gas
+                        })
+                        contract.methods.getParticularStudent($("#idAttendanceDec").val()).call()
+                            .then(function (result) {
+                                console.log('Decrementing Attendance:', result);
+
+
+                                $("#attendanceDec").html('Attendance Decremented ' + result[0] +
+                                    ' for ' + result[1] + ' ' + result[2]);
+                            })
+                            .catch(function (error) {
+                                console.error(error);
+                                alert("Attendance not mark")
+
+
+                            });
+                    });
+
+
+
+
+                    //For getting student details
+                    $("#btnDetails").click(function () {
+                        contract.methods.getParticularStudent($("#idDetails").val()).call()
+                            .then(function (result) {
+                                console.log('Student details:', result);
+                                $("#stdDetails").html('Name: ' + result[1] + ' ' + result[2] +
+                                    '<br />' + 'Age: ' + result[3] + '<br />' + 'Attendace : ' +
+                                    result[4] + ' Days present' + '<br />' + 'Subject : ' +
+                                    result[0] + '<br>' + 'Date : ' + result[5] + '<br><br>');
+                            })
+                            .catch(function (error) {
+                                console.error(error);
+                                alert("Something Went wrong");
+
+
+                            });
+                    });
+
+
+
+
+                    //For getting Student Count
+                    $("#btnCount").click(function () {
+                        contract.methods.countStudents().call()
+                            .then(function (result) {
+                                console.log('Student counts:', result);
+                                $("#stdCount").html('There are currently ' + result + ' students');
+                            })
+                            .catch(function (error) {
+                                console.error(error);
+                                alert("Something Went wrong");
+
+
+                            });
+                    });
+
+
+
+
+
+
+
+
+                    //For getting all Students Details
+                    $("#btnAllDetails").click(function () {
+                        $("#stdAllDetails").html("");
+                        contract.methods.getStudents().call()
+                            .then(function (students) {
+                                students.forEach(function (student) {
+                                    contract.methods.getParticularStudent(student).call()
+                                        .then(function (details) {
+
+
+                                            $("#stdAllDetails").append('Roll No: ' +
+                                                student + '<br />' + 'Name: ' +
+                                                details[1] + ' ' + details[2] +
+                                                '<br />' + 'Age: ' + details[3] +
+                                                '<br />' + 'Attendace : ' + details[
+                                                    4] + ' Days present' +
+                                                '<br />' + 'Subject : ' + details[
+                                                0] + '<br />' + 'Date : ' + details[
+                                                    5] + '<br /><br />');
+                                            console.log(details);
+                                        })
+                                        .catch(function (error) {
+                                            console.error(error);
+                                            alert("Something Went wrong");
+
+
+                                        });
+                                });
+
+
+                            })
+                            .catch(function (error) {
+                                console.error(error);
+                                alert("Something Went wrong");
+
+
+                            });
+                    });
+
+
+
+
+                    // For getting Student ID List
+                    $("#btnStdIds").click(function () {
+                        contract.methods.getStudents().call()
+                            .then(function (result) {
+                                $("#stdIds").html("");
+                                for (var i = 0; i < result.length; i++) {
+                                    $("#stdIds").append("Student " + (i + 1) + ": " + result[i] +
+                                        "<br>");
+                                }
+                                console.log(result[0]);
+                            })
+                            .catch(function (error) {
+                                console.error(error);
+                                alert("Something Went wrong");
+
+
+                            });
+                    });
+
+
+
+
+                });
+            </script>
+
+
+            <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+
+
+</body>
+
+
+</html>
